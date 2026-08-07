@@ -320,6 +320,49 @@ Raw output in [`bench/results/`](bench/results/).
 
 ---
 
+## Render wall-clock
+
+Two clips, same settings, same 480p, same length, both rendered while DS4 was
+loaded and serving on the same nodes.
+
+| Clip | References | Total | Sampling | Per step |
+|---|---:|---:|---:|---:|
+| A | 1 image | 28:31 | 27:00 | 81.03 s |
+| B | 6 images | 28:54 | 26:16 | 78.82 s |
+
+832x480, 362 frames (15.08 s @ 24 fps), 20 steps, `res_multistep`, audio on.
+
+### Reference images are effectively free
+
+Six references cost 23 seconds more than one, and were actually *faster* per
+step. Whatever difference exists is inside the run-to-run noise at this
+resolution and length.
+
+That is worth knowing because identity consistency is the main reason to add
+references, and it turns out you are not paying for it per step. Clip B carried
+six: a character sheet each for three people, plus a vehicle and two locations.
+Nobody drifted between cuts and it cost nothing measurable.
+
+The up-front cost is real but small: references are encoded once before sampling
+starts, which is why a multi-reference render can sit at step 0 for a while and
+look stuck when it is not.
+
+### ⚠️ What these timings are and are not
+
+**DS4 was loaded and serving during both renders, but not under sustained load.**
+The concurrency sweeps in this repo ran against it during parts of both, so both
+clips saw real traffic in bursts, not continuously.
+
+So treat 28:31 and 28:54 as a **light-to-moderate load** figure. They are not a
+clean idle baseline, and they are not what you would get with an agent fleet
+hammering the endpoint for the full render.
+
+**The reverse direction is still unmeasured.** Everything above is what video
+costs the language model. What sustained language-model traffic costs *render
+wall-clock* has not been tested, and we are not going to guess at it.
+
+---
+
 ## Full write-up
 
 The longer version, including the two wrong turns and why they were wrong:
