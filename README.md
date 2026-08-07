@@ -325,10 +325,11 @@ Raw output in [`bench/results/`](bench/results/).
 Two clips, same settings, same 480p, same length, both rendered while DS4 was
 loaded and serving on the same nodes.
 
-| Clip | References | Total | Sampling | Per step |
-|---|---:|---:|---:|---:|
-| A | 1 image | 28:31 | 27:00 | 81.03 s |
-| B | 6 images | 28:54 | 26:16 | 78.82 s |
+| Clip | Conditioning | Total | Sampling | Per step |
+|---|---|---:|---:|---:|
+| A | 1 reference image | 28:31 | 27:00 | 81.03 s |
+| B | 6 reference images | 28:54 | 26:16 | 78.82 s |
+| C | 1 reference **video** (15 s) + 2 images | 23:48 | — | — |
 
 832x480, 362 frames (15.08 s @ 24 fps), 20 steps, `res_multistep`, audio on.
 
@@ -346,6 +347,19 @@ Nobody drifted between cuts and it cost nothing measurable.
 The up-front cost is real but small: references are encoded once before sampling
 starts, which is why a multi-reference render can sit at step 0 for a while and
 look stuck when it is not.
+
+Clip C points the same way. It was conditioned on an entire 15-second video plus
+two character sheets, which is by far the heaviest conditioning of the three, and
+it did not take longer. `MiniMaxH3ReferenceToVideo` accepts `ref_videos`
+alongside `ref_images`, and feeding it the previous clip produced a genuine
+continuation: same room, same light, same performer, rather than a fresh reading
+of a text description.
+
+**One caveat on clip C specifically.** It also ran with less competing traffic
+than A and B, which were rendering during the concurrency sweeps. So its 23:48
+is not evidence that a video reference makes things *faster*. The defensible
+claim is narrower and still useful: **adding a full video reference did not make
+it slower.**
 
 ### ⚠️ What these timings are and are not
 
