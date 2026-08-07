@@ -1,8 +1,13 @@
-# We ran a 1M-context LLM and two video models on the same two boxes. Here's what it actually costs.
+# Two MiniMax H3 instances on two DGX Sparks, with a 1M-context LLM still serving. Here's what it costs.
 
-Two NVIDIA DGX Sparks. DeepSeek-V4-Flash serving agents at full 1,048,576-token
-context with a 1,473,052-token KV pool. And, on the same two machines at the same
-time, two independent MiniMax H3 instances rendering 15-second video with audio.
+**MiniMax H3** is the reason for this post. Two separate instances of it, one per
+node, rendering 15-second 480p clips with synchronised audio on two NVIDIA DGX
+Sparks.
+
+The part worth writing down is what else was running at the same time. Those same
+two Sparks were serving **DeepSeek-V4-Flash** at full 1,048,576-token context
+with a 1,473,052-token KV cache, answering my agents the entire time both renders
+were in flight.
 
 Nothing turned off. No reduced context. No shrunken cache. No restarting between
 "LLM mode" and "video mode."
